@@ -5,7 +5,7 @@ on:
 
 env:
   # ⚠️ عدّل هذه البيانات الأربعة فقط:
-  ROM_URL: "https://download1510.mediafire.com/wec0yl5iq5ug0yQ77BRpSqgLBul5-zy5uEqKzVU2D_QFXgDTluDgF3b67nQwmfs1OKjb11GHGN5ADHL0C8Lx9laJFdNbXXvB4yL3qjZwhlxVlUbag5mz34OuItmwFoV5LYBDVaZ2SaQ2aRJUJPDf3ABZU6c0xX2V_DCMi2UrreiBcA/bak18d0hmk27myh/X626B-H623JKN-P-200511V299%28MobiFirmware.com%29.zip"
+  ROM_URL: "https://download1077.mediafire.com/j035n0ay1bxgKEo9a0g2wB1Xgpgv3ANLderg-vxoxoaW6G5hK4jDfXtgHO27c5sVW7Yn3_7IK29a54NfNvfn-DL68lZsR-hRbS5j2fh6pk2h4ASAn1qsy09NgpNuRKQ4JAvjlfP5jaNdcu5-Y4tYfd5b2IgV4vtRtlwOgSxJ1BjNgg/zd9i9jgf43jixrk/INFINIX-S4-X626B-H623JKN-P-210127V323-FLASH-FILE-RepairMyMobile.rar"
   GITHUB_USER: "sheepan2026-hash"
   GITHUB_TOKEN: "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"
   DEVICE_TREE_URL: "https://github.com"
