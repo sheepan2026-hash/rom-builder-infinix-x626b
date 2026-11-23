@@ -30,18 +30,17 @@ jobs:
         run: |
           mkdir -p ~/stock_rom/extracted
           cd ~/stock_rom
-          echo "Downloading Stock ROM..."
-          wget -O stock.zip "$ROM_URL"
+          echo "Fetching fresh MediaFire direct link..."
+          DIRECT_URL=$(curl -sL "$ROM_URL" | grep -o 'https://download[0-9]*\.mediafire\.com/[^"]*' | head -n 1)
+          echo "Downloading Stock ROM from: $DIRECT_URL"
+          wget -O stock.zip "$DIRECT_URL"
           7z x stock.zip -oextracted/
           
-          # البحث عن ملفات system.img و vendor.img وفك ضغطها
           cd extracted
           SYSTEM_IMG=$(find . -name "system.img" | head -n 1)
           VENDOR_IMG=$(find . -name "vendor.img" | head -n 1)
           
           mkdir -p ~/dump/system ~/dump/vendor
-          
-          # تحويل الصور الخام وفكها باستخدام 7z
           simg2img "$SYSTEM_IMG" system_raw.img || cp "$SYSTEM_IMG" system_raw.img
           simg2img "$VENDOR_IMG" vendor_raw.img || cp "$VENDOR_IMG" vendor_raw.img
           
