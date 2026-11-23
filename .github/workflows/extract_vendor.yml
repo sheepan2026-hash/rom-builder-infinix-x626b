@@ -1,0 +1,71 @@
+name: Extract Vendor Blobs for Infinix X626B
+
+on:
+  workflow_dispatch:
+
+env:
+  # ⚠️ عدّل هذه البيانات الأربعة فقط:
+  ROM_URL: "https://download1510.mediafire.com/wec0yl5iq5ug0yQ77BRpSqgLBul5-zy5uEqKzVU2D_QFXgDTluDgF3b67nQwmfs1OKjb11GHGN5ADHL0C8Lx9laJFdNbXXvB4yL3qjZwhlxVlUbag5mz34OuItmwFoV5LYBDVaZ2SaQ2aRJUJPDf3ABZU6c0xX2V_DCMi2UrreiBcA/bak18d0hmk27myh/X626B-H623JKN-P-200511V299%28MobiFirmware.com%29.zip"
+  GITHUB_USER: "sheepan2026-hash"
+  GITHUB_TOKEN: "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"
+  DEVICE_TREE_URL: "https://github.com"
+
+jobs:
+  extract:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+
+    steps:
+      - name: 1. Free Up Disk Space
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc "/usr/local/share/boost" "$AGENT_TOOLSDIRECTORY"
+          sudo apt-get clean
+
+      - name: 2. Install Extraction Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y p7zip-full unzip simg2img python3 git curl wget
+
+      - name: 3. Download & Extract Stock ROM
+        run: |
+          mkdir -p ~/stock_rom/extracted
+          cd ~/stock_rom
+          echo "Downloading Stock ROM..."
+          wget -O stock.zip "$ROM_URL"
+          7z x stock.zip -oextracted/
+          
+          # البحث عن ملفات system.img و vendor.img وفك ضغطها
+          cd extracted
+          SYSTEM_IMG=$(find . -name "system.img" | head -n 1)
+          VENDOR_IMG=$(find . -name "vendor.img" | head -n 1)
+          
+          mkdir -p ~/dump/system ~/dump/vendor
+          
+          # تحويل الصور الخام وفكها باستخدام 7z
+          simg2img "$SYSTEM_IMG" system_raw.img || cp "$SYSTEM_IMG" system_raw.img
+          simg2img "$VENDOR_IMG" vendor_raw.img || cp "$VENDOR_IMG" vendor_raw.img
+          
+          7z x system_raw.img -o"$HOME/dump/system" -y
+          7z x vendor_raw.img -o"$HOME/dump/vendor" -y
+
+      - name: 4. Run Device Extract Script
+        run: |
+          mkdir -p ~/work/device/infinix/X626B
+          git clone "$DEVICE_TREE_URL" ~/work/device/infinix/X626B
+          cd ~/work/device/infinix/X626B
+          
+          # منح صلاحية التشغيل لسكربت الاستخراج وتشغيله
+          chmod +x extract-files.sh
+          ./extract-files.sh ~/dump
+
+      - name: 5. Push Vendor Blobs to GitHub
+        run: |
+          cd ~/work/vendor/infinix/X626B
+          git init
+          git config user.name "$GITHUB_USER"
+          git config user.email "$GITHUB_USER@://github.com"
+          git branch -M lineage-18.1
+          git add .
+          git commit -m "X626B: Import proprietary vendor blobs from stock ROM"
+          git remote add origin https://${GITHUB_USER}:${GITHUB_TOKEN}@://github.com{GITHUB_USER}/proprietary_vendor_infinix_X626B.git
+          git push -u origin lineage-18.1 --force
