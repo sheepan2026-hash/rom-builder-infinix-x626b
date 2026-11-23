@@ -24,16 +24,16 @@ jobs:
       - name: 2. Install Extraction Tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y p7zip-full unzip simg2img python3 git curl wget
+          sudo apt-get install -y p7zip-full unzip simg2img python3 python3-pip git curl wget
+          pip3 install git+https://github.com
 
       - name: 3. Download & Extract Stock ROM
         run: |
           mkdir -p ~/stock_rom/extracted
           cd ~/stock_rom
-          echo "Fetching fresh MediaFire direct link..."
-          DIRECT_URL=$(curl -sL "$ROM_URL" | grep -o 'https://download[0-9]*\.mediafire\.com/[^"]*' | head -n 1)
-          echo "Downloading Stock ROM from: $DIRECT_URL"
-          wget -O stock.zip "$DIRECT_URL"
+          echo "Downloading Stock ROM via mediafire-dl..."
+          mediafire-dl "$ROM_URL" -o stock.zip
+          
           7z x stock.zip -oextracted/
           
           cd extracted
@@ -46,6 +46,7 @@ jobs:
           
           7z x system_raw.img -o"$HOME/dump/system" -y
           7z x vendor_raw.img -o"$HOME/dump/vendor" -y
+
 
       - name: 4. Run Device Extract Script
         run: |
