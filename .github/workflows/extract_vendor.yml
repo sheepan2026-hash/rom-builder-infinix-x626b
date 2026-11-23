@@ -51,7 +51,7 @@ jobs:
       - name: 4. Run Device Extract Script
         run: |
           mkdir -p ~/work/device/infinix/X626B
-          git clone "$DEVICE_TREE_URL" ~/work/device/infinix/X626B
+          https://github.com/sheepan2026-hash/android_device_Infinix_S4.git
           cd ~/work/device/infinix/X626B
           
           # منح صلاحية التشغيل لسكربت الاستخراج وتشغيله
