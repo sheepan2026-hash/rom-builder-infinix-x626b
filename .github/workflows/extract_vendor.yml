@@ -51,15 +51,21 @@ jobs:
 
       - name: 4. Run Device Extract Script
         run: |
-          mkdir -p ~/work/device/infinix/X626B
-          git clone https://github.com/sheepan2026-hash/android_device_Infinix_S4.git ~/work/device/infinix/X626B
+          mkdir -p ~/work/device/infinix/X626B ~/work/vendor/lineage
+          
+          # تحميل أدوات الاستخراج المساعدة من LineageOS
+          git clone --depth=1 https://github.com -b lineage-18.1 ~/work/vendor/lineage
+          
+          # تحميل شجرة الجهاز وتشغيل الاستخراج
+          git clone https://github.com ~/work/device/infinix/X626B
           cd ~/work/device/infinix/X626B
           chmod +x extract-files.sh
           ./extract-files.sh ~/dump
           
           # ضغط مجلد الـ Vendor الناتج في ملف مضغوط واحد
           cd ~/work
-          zip -r ~/vendor_x626b.zip vendor/
+          zip -r ~/vendor_x626b.zip vendor/infinix/
+
 
       - name: 5. Save Vendor Blobs as Release Asset
         uses: softprops/action-gh-release@v1
