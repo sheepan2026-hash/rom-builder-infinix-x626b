@@ -25,14 +25,38 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y p7zip-full unzip simg2img python3 python3-pip git curl wget
-          pip3 install mediafire-dl
+          pip3 install requests beautifulsoup4
 
       - name: 3. Download & Extract Stock ROM
         run: |
           mkdir -p ~/stock_rom/extracted
           cd ~/stock_rom
-          echo "Downloading Stock ROM via mediafire-dl..."
-          mediafire-dl "$ROM_URL" -o stock.zip
+          
+          cat << 'EOF' > download.py
+          import requests
+          from bs4 import BeautifulSoup
+          import os, sys
+
+          url = os.environ.get('ROM_URL')
+          headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+          
+          print(f"Fetching MediaFire page: {url}")
+          r = requests.get(url, headers=headers)
+          soup = BeautifulSoup(r.text, 'html.parser')
+          
+          # البحث عن زر التحميل المباشر
+          dl_btn = soup.find('a', {'id': 'downloadButton'})
+          if dl_btn and dl_btn.get('href'):
+              direct_url = dl_btn.get('href')
+              print(f"Found direct link: {direct_url}")
+              # تحميل الملف باستخدام wget
+              os.system(f'wget -O stock.zip "{direct_url}"')
+          else:
+              print("Failed to find direct download link!")
+              sys.exit(1)
+          EOF
+
+          python3 download.py
           
           7z x stock.zip -oextracted/
           
@@ -46,6 +70,7 @@ jobs:
           
           7z x system_raw.img -o"$HOME/dump/system" -y
           7z x vendor_raw.img -o"$HOME/dump/vendor" -y
+
 
 
       - name: 4. Run Device Extract Script
