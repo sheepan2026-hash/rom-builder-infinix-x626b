@@ -3,7 +3,7 @@ name: Extract Vendor Blobs for Infinix X626B
 on:
   workflow_dispatch:
 env:
-  ROM_URL: "https://mediafire.com"
+  ROM_URL: "https://download1326.mediafire.com/qwu561izkacgfFV_d0hjEEaSftb57DAwUex8-nDoqBysG1xGexO6tnw-l_p-FC1f_FDBK26066WF8RXOt6WWRxrYB65koI3zuSkgXErjosZLofa7PrL7GhGfoAxnMaJu88xZzmM5KI0z3nKTdiowzU09Oct034KyDjpZ5Yh3ZNLmpw/co5iv6mf70ctgem/Ahmadservicecenter.com-X626B-H623JKN-P-210127V323.zip"
 
 
 jobs:
