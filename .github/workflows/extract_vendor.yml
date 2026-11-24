@@ -31,7 +31,7 @@ jobs:
           cd ~/stock_rom
           
           # تحميل الروم من Google Drive بدون أي حظر
-          gdown --fuzzy "https://drive.google.com/file/d/1OsVyvd1mzLF637UelxvvnMlfaCpRV9Wf/view?usp=sharing" -O stock.zip
+          gdown "https://drive.google.com/file/d/1OsVyvd1mzLF637UelxvvnMlfaCpRV9Wf/view?usp=sharing" -O stock.zip
           
           7z x stock.zip -oextracted/
           
