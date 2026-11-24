@@ -2,9 +2,9 @@ name: Extract Vendor Blobs for Infinix X626B
 
 on:
   workflow_dispatch:
-
 env:
-  ROM_URL: "https://download1077.mediafire.com/j035n0ay1bxgKEo9a0g2wB1Xgpgv3ANLderg-vxoxoaW6G5hK4jDfXtgHO27c5sVW7Yn3_7IK29a54NfNvfn-DL68lZsR-hRbS5j2fh6pk2h4ASAn1qsy09NgpNuRKQ4JAvjlfP5jaNdcu5-Y4tYfd5b2IgV4vtRtlwOgSxJ1BjNgg/zd9i9jgf43jixrk/INFINIX-S4-X626B-H623JKN-P-210127V323-FLASH-FILE-RepairMyMobile.rar"
+  ROM_URL: "https://mediafire.com"
+
 
 jobs:
   extract:
