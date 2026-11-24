@@ -23,42 +23,16 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y p7zip-full unzip zip simg2img python3 python3-pip git curl wget
-          pip3 install playwright
-          playwright install chromium
-          playwright install-deps chromium
+          pip3 install gdown
 
       - name: 3. Download & Extract Stock ROM
         run: |
           mkdir -p ~/stock_rom/extracted
           cd ~/stock_rom
           
-          cat << 'EOF' > download.py
-          from playwright.sync_api import sync_playwright
-          import os, sys
-
-          url = "https://mediafire.com"
+          # تحميل الروم من Google Drive بدون أي حظر
+          gdown --fuzzy "https://drive.google.com/file/d/1OsVyvd1mzLF637UelxvvnMlfaCpRV9Wf/view?usp=sharing" -O stock.zip
           
-          with sync_playwright() as p:
-              browser = p.chromium.launch(headless=True)
-              context = browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
-              page = context.new_page()
-              
-              print("Opening MediaFire page in headless browser...")
-              page.goto(url, wait_until="domcontentloaded", timeout=60000)
-              page.wait_for_selector("a#downloadButton", timeout=30000)
-              
-              direct_url = page.locator("a#downloadButton").get_attribute("href")
-              browser.close()
-
-              if direct_url and direct_url.startswith("http"):
-                  print(f"Success! Direct link extracted.")
-                  os.system(f'wget -O stock.zip "{direct_url}"')
-              else:
-                  print("Could not extract valid link.")
-                  sys.exit(1)
-          EOF
-
-          python3 download.py
           7z x stock.zip -oextracted/
           
           cd extracted
@@ -71,6 +45,7 @@ jobs:
           
           7z x system_raw.img -o"$HOME/dump/system" -y
           7z x vendor_raw.img -o"$HOME/dump/vendor" -y
+
 
 
 
