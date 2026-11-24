@@ -23,7 +23,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y p7zip-full unzip zip simg2img python3 python3-pip git curl wget
-          pip3 install requests beautifulsoup4
+          pip3 install cloudscraper beautifulsoup4
 
       - name: 3. Download & Extract Stock ROM
         run: |
@@ -31,29 +31,29 @@ jobs:
           cd ~/stock_rom
           
           cat << 'EOF' > download.py
-          import requests
+          import cloudscraper
           from bs4 import BeautifulSoup
           import os, sys
 
-          url = os.environ.get('ROM_URL')
-          headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+          url = "https://www.mediafire.com/file/co5iv6mf70ctgem/Ahmadservicecenter.com-X626B-H623JKN-P-210127V323.zip/file"
+          scraper = cloudscraper.create_scraper()
           
           print(f"Fetching MediaFire page: {url}")
-          r = requests.get(url, headers=headers)
+          r = scraper.get(url)
           soup = BeautifulSoup(r.text, 'html.parser')
           
           dl_btn = soup.find('a', {'id': 'downloadButton'})
           if dl_btn and dl_btn.get('href'):
               direct_url = dl_btn.get('href')
               print(f"Found direct link: {direct_url}")
-              os.system(f'wget -O stock.archive "{direct_url}"')
+              os.system(f'wget -O stock.zip "{direct_url}"')
           else:
-              print("Failed to find direct download link!")
+              print("Failed to bypass MediaFire protection!")
               sys.exit(1)
           EOF
 
           python3 download.py
-          7z x stock.archive -oextracted/
+          7z x stock.zip -oextracted/
           
           cd extracted
           SYSTEM_IMG=$(find . -name "system.img" | head -n 1)
@@ -65,6 +65,7 @@ jobs:
           
           7z x system_raw.img -o"$HOME/dump/system" -y
           7z x vendor_raw.img -o"$HOME/dump/vendor" -y
+
 
       - name: 4. Run Device Extract Script
         run: |
