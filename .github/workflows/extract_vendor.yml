@@ -51,19 +51,19 @@ jobs:
 
       - name: 4. Run Device Extract Script
         run: |
-          mkdir -p ~/work/device/infinix/X626B ~/work/vendor/lineage
+          mkdir -p ~/work/device/infinix/X626B ~/work/device/vendor/lineage
           
-          # تجميع الروابط برمجياً لمنع انقطاعها عند النسخ
           GH="https://github.com"
-          git clone --depth=1 "${GH}/LineageOS/android_vendor_lineage.git" -b lineage-18.1 ~/work/vendor/lineage
+          git clone --depth=1 "${GH}/LineageOS/android_vendor_lineage.git" -b lineage-18.1 ~/work/device/vendor/lineage
           git clone "${GH}/sheepan2026-hash/android_device_Infinix_S4.git" ~/work/device/infinix/X626B
           
           cd ~/work/device/infinix/X626B
           chmod +x extract-files.sh
           ./extract-files.sh ~/dump
           
-          cd ~/work
+          cd ~/work/device
           zip -r ~/vendor_x626b.zip vendor/infinix/
+
 
 
       - name: 5. Save Vendor Blobs as Release Asset
