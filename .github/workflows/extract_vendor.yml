@@ -51,17 +51,20 @@ jobs:
 
       - name: 4. Run Device Extract Script
         run: |
-          mkdir -p ~/work/device/infinix/X626B ~/work/device/vendor/lineage
+          mkdir -p ~/rom/device/infinix/X626B ~/rom/vendor/lineage
           
           GH="https://github.com"
-          git clone --depth=1 "${GH}/LineageOS/android_vendor_lineage.git" -b lineage-18.1 ~/work/device/vendor/lineage
-          git clone "${GH}/sheepan2026-hash/android_device_Infinix_S4.git" ~/work/device/infinix/X626B
+          git clone --depth=1 "${GH}/LineageOS/android_vendor_lineage.git" -b lineage-18.1 ~/rom/vendor/lineage
+          git clone "${GH}/sheepan2026-hash/android_device_Infinix_S4.git" ~/rom/device/infinix/X626B
           
-          cd ~/work/device/infinix/X626B
+          cd ~/rom/device/infinix/X626B
+          # توجيه السكربت مباشرة لمجلد الجذر ~/rom لتجنب خطأ المسارات
+          sed -i 's|ANDROID_ROOT=.*|ANDROID_ROOT="$HOME/rom"|g' extract-files.sh
+          
           chmod +x extract-files.sh
           ./extract-files.sh ~/dump
           
-          cd ~/work/device
+          cd ~/rom
           zip -r ~/vendor_x626b.zip vendor/infinix/
 
 
