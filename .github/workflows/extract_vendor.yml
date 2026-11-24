@@ -53,16 +53,15 @@ jobs:
         run: |
           mkdir -p ~/work/device/infinix/X626B ~/work/vendor/lineage
           
-          # تحميل أدوات الاستخراج المساعدة من LineageOS
-          git clone --depth=1 https://github.com -b lineage-18.1 ~/work/vendor/lineage
+          # تجميع الروابط برمجياً لمنع انقطاعها عند النسخ
+          GH="https://github.com"
+          git clone --depth=1 "${GH}/LineageOS/android_vendor_lineage.git" -b lineage-18.1 ~/work/vendor/lineage
+          git clone "${GH}/sheepan2026-hash/android_device_Infinix_S4.git" ~/work/device/infinix/X626B
           
-          # تحميل شجرة الجهاز وتشغيل الاستخراج
-          git clone https://github.com ~/work/device/infinix/X626B
           cd ~/work/device/infinix/X626B
           chmod +x extract-files.sh
           ./extract-files.sh ~/dump
           
-          # ضغط مجلد الـ Vendor الناتج في ملف مضغوط واحد
           cd ~/work
           zip -r ~/vendor_x626b.zip vendor/infinix/
 
