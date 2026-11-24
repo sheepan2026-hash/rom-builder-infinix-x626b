@@ -4,16 +4,14 @@ on:
   workflow_dispatch:
 
 env:
-  # ⚠️ عدّل هذه البيانات الأربعة فقط:
-  ROM_URL: "https://download1077.mediafire.com/j035n0ay1bxgKEo9a0g2wB1Xgpgv3ANLderg-vxoxoaW6G5hK4jDfXtgHO27c5sVW7Yn3_7IK29a54NfNvfn-DL68lZsR-hRbS5j2fh6pk2h4ASAn1qsy09NgpNuRKQ4JAvjlfP5jaNdcu5-Y4tYfd5b2IgV4vtRtlwOgSxJ1BjNgg/zd9i9jgf43jixrk/INFINIX-S4-X626B-H623JKN-P-210127V323-FLASH-FILE-RepairMyMobile.rar"
-  GITHUB_USER: "sheepan2026-hash"
-  GITHUB_TOKEN: "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"
-  DEVICE_TREE_URL: "https://github.com"
+  ROM_URL: "https://mediafire.com"
 
 jobs:
   extract:
     runs-on: ubuntu-22.04
     timeout-minutes: 120
+    permissions:
+      contents: write
 
     steps:
       - name: 1. Free Up Disk Space
@@ -24,7 +22,7 @@ jobs:
       - name: 2. Install Extraction Tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y p7zip-full unzip simg2img python3 python3-pip git curl wget
+          sudo apt-get install -y p7zip-full unzip zip simg2img python3 python3-pip git curl wget
           pip3 install requests beautifulsoup4
 
       - name: 3. Download & Extract Stock ROM
@@ -44,21 +42,18 @@ jobs:
           r = requests.get(url, headers=headers)
           soup = BeautifulSoup(r.text, 'html.parser')
           
-          # البحث عن زر التحميل المباشر
           dl_btn = soup.find('a', {'id': 'downloadButton'})
           if dl_btn and dl_btn.get('href'):
               direct_url = dl_btn.get('href')
               print(f"Found direct link: {direct_url}")
-              # تحميل الملف باستخدام wget
-              os.system(f'wget -O stock.zip "{direct_url}"')
+              os.system(f'wget -O stock.archive "{direct_url}"')
           else:
               print("Failed to find direct download link!")
               sys.exit(1)
           EOF
 
           python3 download.py
-          
-          7z x stock.zip -oextracted/
+          7z x stock.archive -oextracted/
           
           cd extracted
           SYSTEM_IMG=$(find . -name "system.img" | head -n 1)
@@ -71,26 +66,21 @@ jobs:
           7z x system_raw.img -o"$HOME/dump/system" -y
           7z x vendor_raw.img -o"$HOME/dump/vendor" -y
 
-
-
       - name: 4. Run Device Extract Script
         run: |
           mkdir -p ~/work/device/infinix/X626B
-          https://github.com/sheepan2026-hash/android_device_Infinix_S4.git
+          git clone https://github.com/sheepan2026-hash/android_device_Infinix_S4.git ~/work/device/infinix/X626B
           cd ~/work/device/infinix/X626B
-          
-          # منح صلاحية التشغيل لسكربت الاستخراج وتشغيله
           chmod +x extract-files.sh
           ./extract-files.sh ~/dump
+          
+          # ضغط مجلد الـ Vendor الناتج في ملف مضغوط واحد
+          cd ~/work
+          zip -r ~/vendor_x626b.zip vendor/
 
-      - name: 5. Push Vendor Blobs to GitHub
-        run: |
-          cd ~/work/vendor/infinix/X626B
-          git init
-          git config user.name "$GITHUB_USER"
-          git config user.email "$GITHUB_USER@://github.com"
-          git branch -M lineage-18.1
-          git add .
-          git commit -m "X626B: Import proprietary vendor blobs from stock ROM"
-          git remote add origin https://${GITHUB_USER}:${GITHUB_TOKEN}@://github.com{GITHUB_USER}/proprietary_vendor_infinix_X626B.git
-          git push -u origin lineage-18.1 --force
+      - name: 5. Save Vendor Blobs as Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: vendor-blobs-x626b
+          name: Infinix X626B Vendor Blobs
+          files: ~/vendor_x626b.zip
