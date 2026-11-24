@@ -25,7 +25,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y p7zip-full unzip simg2img python3 python3-pip git curl wget
-          pip3 install git+https://github.com
+          pip3 install mediafire-dl
 
       - name: 3. Download & Extract Stock ROM
         run: |
