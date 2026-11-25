@@ -57,16 +57,23 @@ jobs:
           git clone "${GH}/sheepan2026-hash/android_device_Infinix_S4.git" device/Infinix/X626
           
           cd ~/rom/device/Infinix/X626
-          # إعادة اسم ملف المنتج الأصلي X626 لضمان تطابق التغليف النهائي 100%
           [ -f lineage_X626B.mk ] && mv lineage_X626B.mk lineage_X626.mk || true
           sed -i 's/X626B/X626/g' lineage_X626.mk AndroidProducts.mk
           sed -i 's|device/infinix/X626|device/Infinix/X626|g' lineage_X626.mk AndroidProducts.mk
-          
-          # السماح بتفليش الروم على X626B و X626 معاً دون رفض من الريكفري
-          echo 'TARGET_OTA_ASSERT_DEVICE := X626,X626B,Infinix-X626,Infinix-X626B' >> BoardConfig.mk
-          
-          # تحديث معمارية المعالج لتتوافق مع Android 11
           find . -type f -exec sed -i 's/armv7-a-neon/armv8-a/g' {} +
+          
+          # إضافة أحجام الأقسام وإعدادات التغليف الضرورية لبناء الروم الكامل (bacon)
+          cat << 'EOF' >> BoardConfig.mk
+          TARGET_OTA_ASSERT_DEVICE := X626,X626B,Infinix-X626,Infinix-X626B
+          BOARD_BOOTIMAGE_PARTITION_SIZE := 33554432
+          BOARD_RECOVERYIMAGE_PARTITION_SIZE := 33554432
+          BOARD_SYSTEMIMAGE_PARTITION_SIZE := 3221225472
+          BOARD_SYSTEMIMAGE_FILE_SYSTEM_TYPE := ext4
+          BOARD_VENDORIMAGE_PARTITION_SIZE := 536870912
+          BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
+          TARGET_COPY_OUT_VENDOR := vendor
+          BOARD_FLASH_BLOCK_SIZE := 131072
+          EOF
           
           # تحميل وفك ضغط ملف الـ Vendor
           cd ~/rom
@@ -78,11 +85,11 @@ jobs:
           cd ~/rom
           source build/envsetup.sh
           lunch lineage_X626-userdebug
-          mka otapackage -j$(nproc --all)
+          mka bacon -j$(nproc --all)
 
       - name: 8. Upload ROM to PixelDrain
         run: |
-          ROM_FILE=$(find ~/rom/out/target/product/X626/ -name "*ota*.zip" -o -name "lineage-*.zip" | head -n 1)
-          echo "Found ROM file: $ROM_FILE"
+          ROM_FILE=$(find ~/rom/out/target/product/X626/ -name "lineage-*.zip" | head -n 1)
+          echo "Uploading $ROM_FILE..."
           curl -T "$ROM_FILE" https://pixeldrain.com
 
