@@ -57,16 +57,19 @@ jobs:
           git clone --depth=1 "${GH}/LineageOS/android_vendor_lineage.git" -b lineage-18.1 ~/rom/vendor/lineage
           git clone "${GH}/sheepan2026-hash/android_device_Infinix_S4.git" ~/rom/device/infinix/X626B
           
-          # إنشاء رابط رمزي يجعل المسار النسبي الأصلي للسكربت يعمل تلقائياً دون تعديل السكربت
-          ln -sfn ~/rom/vendor ~/rom/device/vendor
+          # التأكد من مكان وجود ملف extract_utils.sh الفعلي
+          HELPER=$(find ~/rom/vendor/lineage -name "extract_utils.sh" | head -n 1)
+          echo "Found helper at: $HELPER"
           
           cd ~/rom/device/infinix/X626B
+          # استبدال أي مسار لـ extract_utils.sh بالمسار الحقيقي المباشر
+          sed -i "s|.*extract_utils.sh.*|HELPER=\"$HELPER\"|g" extract-files.sh
+          
           chmod +x *.sh
           ./extract-files.sh ~/dump
           
           cd ~/rom
           zip -r ~/vendor_x626b.zip vendor/infinix/
-
 
 
       - name: 5. Save Vendor Blobs as Release Asset
