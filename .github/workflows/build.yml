@@ -41,7 +41,7 @@ jobs:
           cd ~/rom
           git config --global user.name "Builder"
           git config --global user.email "builder@example.com"
-          repo init --depth=1 -u https://github.com -b lineage-18.1 --git-lfs
+          repo init --depth=1 -u https://github.com -b lineage-18.1
           repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
 
       - name: 6. Setup Device & Vendor Trees
