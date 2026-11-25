@@ -54,7 +54,8 @@ jobs:
         run: |
           cd ~/rom
           GH="https://github.com"
-          git clone "${GH}/sheepan2026-hash/android_device_Infinix_S4.git" device/infinix/X626B
+          # وضع شجرة الجهاز في مسارها الأصلي المطابق لملفات الـ Vendor
+          git clone "${GH}/sheepan2026-hash/android_device_Infinix_S4.git" device/Infinix/X626
           
           # تحميل وفك ضغط ملف الـ Vendor من الـ Release الخاص بك
           curl -L "${GH}/sheepan2026-hash/rom-builder-infinix-x626b/releases/download/vendor-blobs-x626b/vendor_x626b.zip" -o vendor.zip
@@ -64,7 +65,7 @@ jobs:
         run: |
           cd ~/rom
           source build/envsetup.sh
-          lunch lineage_X626B-userdebug
+          lunch lineage_X626-userdebug
           mka bacon -j$(nproc --all)
 
       - name: 8. Upload ROM to PixelDrain
