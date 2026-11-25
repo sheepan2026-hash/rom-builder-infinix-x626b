@@ -51,26 +51,21 @@ jobs:
 
       - name: 4. Run Device Extract Script
         run: |
-          mkdir -p ~/rom/device/infinix/X626B ~/rom/tools/extract-utils
+          mkdir -p ~/rom/device/infinix/X626B ~/rom/vendor/lineage/build/tools
           
           GH="https://github.com"
-          # تحميل مستودع أدوات الاستخراج الصحيح من LineageOS
-          git clone --depth=1 "${GH}/LineageOS/android_tools_extract-utils.git" -b lineage-18.1 ~/rom/tools/extract-utils
+          # وضع أدوات الاستخراج في المسار الدقيق الذي يطلبه السكربت
+          git clone --depth=1 "${GH}/LineageOS/android_tools_extract-utils.git" -b lineage-18.1 ~/rom/vendor/lineage/build/tools
           git clone "${GH}/sheepan2026-hash/android_device_Infinix_S4.git" ~/rom/device/infinix/X626B
           
-          # التأكد من مكان وجود ملف extract_utils.sh الفعلي
-          HELPER=$(find ~/rom/tools/extract-utils -name "extract_utils.sh" | head -n 1)
-          echo "Found helper at: $HELPER"
-          
           cd ~/rom/device/infinix/X626B
-          # استبدال المسار القديم بمسار الأداة الحقيقي
-          sed -i "s|.*extract_utils.sh.*|HELPER=\"$HELPER\"|g" extract-files.sh
-          
           chmod +x *.sh
           ./extract-files.sh ~/dump
           
+          # حذف مجلد الأدوات المؤقت وضغط مجلد التعريفات الناتج (Infinix/X626) بالكامل
+          rm -rf ~/rom/vendor/lineage
           cd ~/rom
-          zip -r ~/vendor_x626b.zip vendor/infinix/
+          zip -r ~/vendor_x626b.zip vendor/
 
 
       - name: 5. Save Vendor Blobs as Release Asset
