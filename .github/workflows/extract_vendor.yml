@@ -58,11 +58,11 @@ jobs:
           git clone "${GH}/sheepan2026-hash/android_device_Infinix_S4.git" ~/rom/device/infinix/X626B
           
           cd ~/rom/device/infinix/X626B
-          # استبدال المسار النسبي مباشرة بمسار مجلد العمل الأساسي
-          sed -i "s|\./\.\./\.\./\.\.|$HOME/rom|g" extract-files.sh
-          sed -i "s|\.\./\.\./\.\.|$HOME/rom|g" extract-files.sh
+          # تصحيح المسار وإزالة النقطة الزائدة من جميع ملفات السكربت
+          sed -i "s|\.\./\.\./\.\.|$HOME/rom|g" *.sh
+          sed -i "s|\./home/runner|/home/runner|g" *.sh
           
-          chmod +x extract-files.sh
+          chmod +x *.sh
           ./extract-files.sh ~/dump
           
           cd ~/rom
