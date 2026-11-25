@@ -17,6 +17,8 @@ jobs:
 
       - name: 2. Setup Swap Space
         run: |
+          sudo swapoff -a || true
+          sudo rm -f /swapfile
           sudo fallocate -l 16G /swapfile
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
