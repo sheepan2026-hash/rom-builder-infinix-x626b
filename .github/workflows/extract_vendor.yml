@@ -57,11 +57,10 @@ jobs:
           git clone --depth=1 "${GH}/LineageOS/android_vendor_lineage.git" -b lineage-18.1 ~/rom/vendor/lineage
           git clone "${GH}/sheepan2026-hash/android_device_Infinix_S4.git" ~/rom/device/infinix/X626B
           
-          cd ~/rom/device/infinix/X626B
-          # تصحيح المسار وإزالة النقطة الزائدة من جميع ملفات السكربت
-          sed -i "s|\.\./\.\./\.\.|$HOME/rom|g" *.sh
-          sed -i "s|\./home/runner|/home/runner|g" *.sh
+          # إنشاء رابط رمزي يجعل المسار النسبي الأصلي للسكربت يعمل تلقائياً دون تعديل السكربت
+          ln -sfn ~/rom/vendor ~/rom/device/vendor
           
+          cd ~/rom/device/infinix/X626B
           chmod +x *.sh
           ./extract-files.sh ~/dump
           
