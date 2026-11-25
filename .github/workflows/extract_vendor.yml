@@ -51,18 +51,19 @@ jobs:
 
       - name: 4. Run Device Extract Script
         run: |
-          mkdir -p ~/rom/device/infinix/X626B ~/rom/vendor/lineage
+          mkdir -p ~/rom/device/infinix/X626B ~/rom/tools/extract-utils
           
           GH="https://github.com"
-          git clone --depth=1 "${GH}/LineageOS/android_vendor_lineage.git" -b lineage-18.1 ~/rom/vendor/lineage
+          # تحميل مستودع أدوات الاستخراج الصحيح من LineageOS
+          git clone --depth=1 "${GH}/LineageOS/android_tools_extract-utils.git" -b lineage-18.1 ~/rom/tools/extract-utils
           git clone "${GH}/sheepan2026-hash/android_device_Infinix_S4.git" ~/rom/device/infinix/X626B
           
           # التأكد من مكان وجود ملف extract_utils.sh الفعلي
-          HELPER=$(find ~/rom/vendor/lineage -name "extract_utils.sh" | head -n 1)
+          HELPER=$(find ~/rom/tools/extract-utils -name "extract_utils.sh" | head -n 1)
           echo "Found helper at: $HELPER"
           
           cd ~/rom/device/infinix/X626B
-          # استبدال أي مسار لـ extract_utils.sh بالمسار الحقيقي المباشر
+          # استبدال المسار القديم بمسار الأداة الحقيقي
           sed -i "s|.*extract_utils.sh.*|HELPER=\"$HELPER\"|g" extract-files.sh
           
           chmod +x *.sh
