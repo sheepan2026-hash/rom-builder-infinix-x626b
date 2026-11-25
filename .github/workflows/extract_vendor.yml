@@ -73,4 +73,4 @@ jobs:
         with:
           tag_name: vendor-blobs-x626b
           name: Infinix X626B Vendor Blobs
-          files: ~/vendor_x626b.zip
+          files: /home/runner/vendor_x626b.zip
