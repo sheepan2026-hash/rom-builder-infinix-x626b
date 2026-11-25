@@ -41,7 +41,13 @@ jobs:
           cd ~/rom
           git config --global user.name "Builder"
           git config --global user.email "builder@example.com"
-          repo init --depth=1 -u https://github.com -b lineage-18.1
+          
+          # تجميع الرابط برمجياً لمنع انقطاعه عند النسخ واللصق
+          GH="https://github.com"
+          MANIFEST_URL="${GH}/LineageOS/android.git"
+          echo "Initializing manifest from: $MANIFEST_URL"
+          
+          repo init --depth=1 -u "$MANIFEST_URL" -b lineage-18.1
           repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
 
       - name: 6. Setup Device & Vendor Trees
