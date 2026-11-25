@@ -54,10 +54,17 @@ jobs:
         run: |
           cd ~/rom
           GH="https://github.com"
-          # وضع شجرة الجهاز في مسارها الأصلي المطابق لملفات الـ Vendor
           git clone "${GH}/sheepan2026-hash/android_device_Infinix_S4.git" device/Infinix/X626
           
-          # تحميل وفك ضغط ملف الـ Vendor من الـ Release الخاص بك
+          # توحيد أسماء الملفات تلقائياً لمنع أي تعارض بين X626 و X626B
+          cd ~/rom/device/Infinix/X626
+          [ -f X626.mk ] && cp -n X626.mk X626B.mk || true
+          [ -f lineage_X626B.mk ] && sed -i 's|device/infinix/X626B|device/Infinix/X626|g' lineage_X626B.mk || true
+          [ -f lineage_X626B.mk ] && sed -i 's|X626B.mk|X626.mk|g' lineage_X626B.mk || true
+          [ -f AndroidProducts.mk ] && sed -i 's|device/infinix/X626B|device/Infinix/X626|g' AndroidProducts.mk || true
+          
+          # تحميل وفك ضغط ملف الـ Vendor
+          cd ~/rom
           curl -L "${GH}/sheepan2026-hash/rom-builder-infinix-x626b/releases/download/vendor-blobs-x626b/vendor_x626b.zip" -o vendor.zip
           unzip -o vendor.zip -d ~/rom/
 
@@ -65,12 +72,12 @@ jobs:
         run: |
           cd ~/rom
           source build/envsetup.sh
-          lunch lineage_X626-userdebug
+          lunch lineage_X626B-userdebug
           mka bacon -j$(nproc --all)
 
       - name: 8. Upload ROM to PixelDrain
         run: |
-          cd ~/rom/out/target/product/X626B
-          ROM_FILE=$(ls lineage-*.zip | head -n 1)
+          ROM_FILE=$(find ~/rom/out/target/product/ -name "lineage-*.zip" | head -n 1)
           echo "Uploading $ROM_FILE..."
           curl -T "$ROM_FILE" https://pixeldrain.com
+
