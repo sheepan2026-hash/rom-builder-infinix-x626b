@@ -31,10 +31,9 @@ jobs:
 
       - name: 4. Setup Repo Tool
         run: |
-          mkdir -p ~/bin
-          curl https://googleapis.com > ~/bin/repo
-          chmod a+x ~/bin/repo
-          echo "$HOME/bin" >> $GITHUB_PATH
+          sudo apt-get update
+          sudo apt-get install -y repo
+          repo --version
 
       - name: 5. Initialize & Sync LineageOS 18.1
         run: |
