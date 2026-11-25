@@ -78,12 +78,11 @@ jobs:
           cd ~/rom
           source build/envsetup.sh
           lunch lineage_X626-userdebug
-          mka bacon -j$(nproc --all)
-
+          mka otapackage -j$(nproc --all)
 
       - name: 8. Upload ROM to PixelDrain
         run: |
-          ROM_FILE=$(find ~/rom/out/target/product/ -name "lineage-*.zip" | head -n 1)
-          echo "Uploading $ROM_FILE..."
+          ROM_FILE=$(find ~/rom/out/target/product/X626/ -name "*ota*.zip" -o -name "lineage-*.zip" | head -n 1)
+          echo "Found ROM file: $ROM_FILE"
           curl -T "$ROM_FILE" https://pixeldrain.com
 
