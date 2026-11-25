@@ -56,13 +56,15 @@ jobs:
           GH="https://github.com"
           git clone "${GH}/sheepan2026-hash/android_device_Infinix_S4.git" device/Infinix/X626
           
-          # توحيد الأسماء وتحديث معمارية المعالج لتتوافق مع Android 11
+          # توحيد الأسماء وتحديث معمارية المعالج في جميع ملفات شجرة الجهاز
           cd ~/rom/device/Infinix/X626
           [ -f X626.mk ] && cp -n X626.mk X626B.mk || true
           [ -f lineage_X626B.mk ] && sed -i 's|device/infinix/X626B|device/Infinix/X626B|g' lineage_X626B.mk || true
           [ -f lineage_X626B.mk ] && sed -i 's|device/Infinix/X626/|device/Infinix/X626B/|g' lineage_X626B.mk || true
           [ -f AndroidProducts.mk ] && sed -i 's|device/infinix/X626B|device/Infinix/X626B|g' AndroidProducts.mk || true
-          [ -f BoardConfig.mk ] && sed -i 's/armv7-a-neon/armv8-a/g' BoardConfig.mk || true
+          
+          # البحث الشامل واستبدال armv7-a-neon في كل الملفات أينما وجدت
+          find . -type f -exec sed -i 's/armv7-a-neon/armv8-a/g' {} +
           
           # تحميل وفك ضغط ملف الـ Vendor
           cd ~/rom
@@ -72,6 +74,7 @@ jobs:
           # ربط مجلدات X626 باسم X626B
           ln -sfn ~/rom/device/Infinix/X626 ~/rom/device/Infinix/X626B
           ln -sfn ~/rom/vendor/Infinix/X626 ~/rom/vendor/Infinix/X626B
+
 
 
       - name: 7. Compile ROM
