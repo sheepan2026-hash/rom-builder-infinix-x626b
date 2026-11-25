@@ -1,71 +1,66 @@
-name: Build Custom ROM for Infinix X626B
+name: Build LineageOS 18.1 for Infinix X626B
 
 on:
-  workflow_dispatch: # يتيح لك تشغيل البناء يدوياً بضغطة زر
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-22.04
-    timeout-minutes: 360 # أقصى مدة متاحة (6 ساعات)
+    timeout-minutes: 360
 
     steps:
-      - name: 1. Free Up Disk Space (تنظيف المساحة)
+      - name: 1. Free Up Disk Space
         run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "/usr/local/share/boost"
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          sudo rm -rf /usr/share/dotnet /opt/ghc "/usr/local/share/boost" "$AGENT_TOOLSDIRECTORY"
           sudo docker image prune --all --force
           sudo apt-get clean
-          df -h
 
-      - name: 2. Setup Swap Space (زيادة الرام الافتراضية)
+      - name: 2. Setup Swap Space
         run: |
           sudo fallocate -l 16G /swapfile
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
           sudo swapon /swapfile
-          free -h
 
-      - name: 3. Install Build Packages (تثبيت أدوات البناء)
+      - name: 3. Install Build Packages
         run: |
           sudo apt-get update
-          sudo apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git git-lfs gnupg gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev libelf-dev liblz4-tool libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev python-is-python3
+          sudo apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git git-lfs gnupg gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev libelf-dev liblz4-tool libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip unzip zlib1g-dev python-is-python3
 
-      - name: 4. Setup Repo Tool (تجهيز أداة المزامنة)
+      - name: 4. Setup Repo Tool
         run: |
           mkdir -p ~/bin
           curl https://googleapis.com > ~/bin/repo
           chmod a+x ~/bin/repo
           echo "$HOME/bin" >> $GITHUB_PATH
 
-      - name: 5. Initialize & Sync ROM Source (تحميل الكود المصدري)
+      - name: 5. Initialize & Sync LineageOS 18.1
         run: |
           mkdir -p ~/rom
           cd ~/rom
           git config --global user.name "Builder"
           git config --global user.email "builder@example.com"
-          # مثال: LineageOS 18.1 (يمكنك تغييره لأي روم آخر)
           repo init --depth=1 -u https://github.com -b lineage-18.1 --git-lfs
           repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
 
-      - name: 6. Clone Device Trees (تحميل ملفات هاتف Infinix X626B)
+      - name: 6. Setup Device & Vendor Trees
         run: |
           cd ~/rom
-          # ⚠️ استبدل الروابط التالية بروابط مستودعاتك على GitHub
-          git clone https://github.com device/infinix/X626B
-          git clone https://github.com -b lineage-18.1 vendor/infinix/X626B
-          # إذا كان الكيرنل في مستودع منفصل، أضفه هنا:
-          # git clone https://github.com -b lineage-18.1 kernel/infinix/X626B
+          GH="https://github.com"
+          git clone "${GH}/sheepan2026-hash/android_device_Infinix_S4.git" device/infinix/X626B
+          
+          # تحميل وفك ضغط ملف الـ Vendor من الـ Release الخاص بك
+          curl -L "${GH}/sheepan2026-hash/rom-builder-infinix-x626b/releases/download/vendor-blobs-x626b/vendor_x626b.zip" -o vendor.zip
+          unzip -o vendor.zip -d ~/rom/
 
-      - name: 7. Start Compilation (بدء عملية البناء)
+      - name: 7. Compile ROM
         run: |
           cd ~/rom
           source build/envsetup.sh
           lunch lineage_X626B-userdebug
           mka bacon -j$(nproc --all)
 
-      - name: 8. Upload ROM to PixelDrain (رفع الروم للحصول على رابط تحميل)
+      - name: 8. Upload ROM to PixelDrain
         run: |
           cd ~/rom/out/target/product/X626B
           ROM_FILE=$(ls lineage-*.zip | head -n 1)
